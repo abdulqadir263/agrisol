@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "460720345002",
+    "project_id": "agri-sol",
+    "storage_bucket": "agri-sol.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:460720345002:android:474a3aa74bd883446865d3",
+        "android_client_info": {
+          "package_name": "com.example.agrisol"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwhPHJ3hFa5ev6P7j8MsmXwy7KzAkTuSk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
