@@ -7,9 +7,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 
 import 'firebase_options.dart';
+import 'package:agrisol/ui/add_post.dart';
 
-
-Future<void> main() async{
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
@@ -25,21 +25,20 @@ class MyApp extends StatelessWidget{
       title: "Agri-Sol",
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.greenAccent),
-            useMaterial3: true,
+        useMaterial3: true,
       ),
 
       getPages: [
         GetPage(name: "/login", page: () =>  LoginPage(), binding: LoginBinding()),
         GetPage(name: "/signup", page: () =>  SignupPage(), binding: SignUpBinding()),
         GetPage(name: "/forget_password", page: () =>  ResetPasswordPage(), binding: ResetPasswordBinding()),
-        GetPage(name: "/home", page: () =>  HomePage())
+        GetPage(name: "/home", page: () =>  HomePage()),
+        GetPage(name: "/add_post", page: () =>  AddPostPage(), binding: AddPostBinding()), // Add this line
       ],
 
       initialRoute: '/login',
-
       initialBinding: LoginBinding(),
       home: LoginPage(),
     );
   }
-
 }

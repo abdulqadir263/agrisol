@@ -10,6 +10,10 @@ class AuthRepository{
     return FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
   }
 
+  String? getCurrentUserName() {
+    return FirebaseAuth.instance.currentUser?.displayName;
+  }
+
   User? getLoggedInUser(){
     return FirebaseAuth.instance.currentUser;
   }

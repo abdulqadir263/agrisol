@@ -12,15 +12,14 @@ class ResetPasswordPage extends StatefulWidget {
 }
 
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  late TextEditingController emailController;
   late ResetPasswordViewModel resetViewModel;
 
   @override
   void initState() {
     super.initState();
+    emailController = TextEditingController(text:  Get.arguments);
     resetViewModel = Get.find();
-
   }
 
   @override
@@ -32,7 +31,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text("Reset Password"),
-            // Email Field
+
             TextField(
               controller: emailController,
               decoration: InputDecoration(
@@ -48,9 +47,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             ),
             const SizedBox(height: 20),
 
-
-
-            // Login Button
             Obx(() {
               return resetViewModel.isLoading.value
                   ? const CircularProgressIndicator()
@@ -69,8 +65,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             ),
 
             const SizedBox(height: 15),
-
-
 
             TextButton(
                 onPressed: () {

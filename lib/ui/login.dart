@@ -36,7 +36,9 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Login to Continue"),
+            Text("Login to Continue", style: TextStyle(fontSize: 20),),
+
+            const SizedBox(height: 20),
             // Email Field
             TextField(
               controller: emailController,
@@ -116,13 +118,26 @@ class _LoginPageState extends State<LoginPage> {
 
             TextButton(
                 onPressed: () {
-                  Get.toNamed('/forget_password');
+                  Get.toNamed('/forget_password', arguments: emailController.text);
                 },
                 child: Text(
                   "Forgot Password?",
                   style: TextStyle(fontSize: 16),
                 )
-            )
+            ),
+
+            const SizedBox(height: 15),
+
+            TextButton(
+                onPressed: () {
+                  Get.toNamed('/home');
+                },
+                child: Text(
+                  "Create Account Later",
+                  style: TextStyle(fontSize: 16),
+                )
+            ),
+
 
           ],
         ),
