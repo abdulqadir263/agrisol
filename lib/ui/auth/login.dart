@@ -1,8 +1,9 @@
 import 'package:agrisol/ui/auth/view_models/login_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:agrisol/ui/posts/posts.dart';
 
-import '../data/AuthRepository.dart';
+import '../../data/AuthRepository.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -23,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
     loginViewModel = Get.find();
 
     if(loginViewModel.isUserLoggedIn()){
-      Get.offAllNamed('/home');
+      Get.offAllNamed('/posts');
     }
 
   }
@@ -130,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
 
             TextButton(
                 onPressed: () {
-                  Get.toNamed('/home');
+                  Get.toNamed('/posts');
                 },
                 child: Text(
                   "Create Account Later",

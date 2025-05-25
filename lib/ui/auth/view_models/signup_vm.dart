@@ -27,7 +27,7 @@ class SignUpViewModel extends GetxController{
     isLoading.value = true;
     try{
       await authRepository.signup(email, password);
-      Get.offAllNamed('/home');
+      Get.offAllNamed('/posts');
       //Success
     }on FirebaseAuthException catch(e){
       Get.snackbar("Error", e.message ?? "SignUp Failed");

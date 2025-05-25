@@ -1,54 +1,55 @@
+
+import 'package:agrisol/model/post.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 
-class PostRepository {
-  final FirebaseFirestore _firestore;
+class PostsRepository{
 
-  PostRepository() : _firestore = FirebaseFirestore.instance;
+  late CollectionReference postsCollection;
 
-  Future<void> addPost({
-    required String userId,
-    required String userName,
-    required String title,
-    required String description,
-    required String category,
-  }) async {
-    try {
-      await _firestore.collection('posts').add({
-        'userId': userId,
-        'userName': userName,
-        'title': title,
-        'description': description,
-        'category': category,
-        'createdAt': FieldValue.serverTimestamp(),
-        'likes': 0,
-        'comments': [],
-      });
-    } catch (e) {
-      debugPrint('Error adding post: $e');
-      rethrow;
-    }
+  PostsRepository(){
+    postsCollection = FirebaseFirestore.instance.collection('posts');
   }
 
-  Stream<QuerySnapshot> getPostsStream() {
-    return _firestore
-        .collection('posts')
-        .orderBy('createdAt', descending: true)
-        .snapshots();
+  Future<void> addPost(Post post){
+    var doc = postsCollection.doc();
+    post.id = doc.id;
+    return doc.set(post.toMap());
+  }
+
+  Future<void> updatePost(Post post){
+    return postsCollection.doc(post.id).set(post.toMap());
+  }
+
+  Future<void> deletePost(Post post){
+    return postsCollection.doc(post.id).delete();
+  }
+
+  Stream<List<Post>> loadAllPosts(){
+     return postsCollection.snapshots().map((snapshot) {
+       return convertToPosts(snapshot);
+    },
+    );
   }
 
 
-  Future<List<DocumentSnapshot>> getPosts() async {
-    try {
-      final querySnapshot = await _firestore
-          .collection('posts')
-          .orderBy('createdAt', descending: true)
-          .get();
-      return querySnapshot.docs;
-    } catch (e) {
-      debugPrint('Error getting posts: $e');
-      rethrow;
+  Stream<List<Post>> loadPostsOfUser(String uId){
+    return postsCollection.where('uId', isEqualTo: uId).snapshots().map(
+          (snapshot) {
+            return convertToPosts(snapshot);
+    },
+    );
+  }
+
+  Future<List<Post>> loadAllPostsOnce() async {
+    var snapshot = await postsCollection.get();
+    return convertToPosts(snapshot);
+  }
+
+  List<Post> convertToPosts(QuerySnapshot snapshot){
+    List<Post> posts = [];
+    for(var snap in snapshot.docs){
+      posts.add(Post.fromMap(snap.data() as Map<String, dynamic>));
     }
+    return posts;
   }
 }

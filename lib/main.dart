@@ -1,13 +1,14 @@
-import 'package:agrisol/ui/forget_password.dart';
+import 'package:agrisol/ui/auth/forget_password.dart';
 import 'package:agrisol/ui/home/home.dart';
-import 'package:agrisol/ui/login.dart';
-import 'package:agrisol/ui/signup.dart';
+import 'package:agrisol/ui/auth/login.dart';
+import 'package:agrisol/ui/posts/add_post.dart';
+import 'package:agrisol/ui/posts/posts.dart';
+import 'package:agrisol/ui/auth/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 
 import 'firebase_options.dart';
-import 'package:agrisol/ui/add_post.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,12 +34,11 @@ class MyApp extends StatelessWidget{
         GetPage(name: "/signup", page: () =>  SignupPage(), binding: SignUpBinding()),
         GetPage(name: "/forget_password", page: () =>  ResetPasswordPage(), binding: ResetPasswordBinding()),
         GetPage(name: "/home", page: () =>  HomePage()),
-        GetPage(name: "/add_post", page: () =>  AddPostPage(), binding: AddPostBinding()), // Add this line
+        GetPage(name: "/posts", page: () =>  PostsPage(), binding: PostsBinding()),
+        GetPage(name: "/addPost", page: () =>  AddPostPage(), binding: AddPostBinding()),
       ],
 
       initialRoute: '/login',
-      initialBinding: LoginBinding(),
-      home: LoginPage(),
     );
   }
 }

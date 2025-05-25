@@ -2,7 +2,7 @@ import 'package:agrisol/ui/auth/view_models/reset_password_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../data/AuthRepository.dart';
+import '../../data/AuthRepository.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});

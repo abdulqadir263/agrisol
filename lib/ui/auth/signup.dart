@@ -1,11 +1,8 @@
-import 'package:agrisol/ui/auth/view_models/login_vm.dart';
-import 'package:agrisol/ui/home/home.dart';
-import 'package:agrisol/ui/login.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../data/AuthRepository.dart';
-import 'auth/view_models/signup_vm.dart';
+import '../../data/AuthRepository.dart';
+import 'view_models/signup_vm.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -27,7 +24,7 @@ class _SignupPageState extends State<SignupPage> {
     signUpViewModel = Get.find();
 
     if(signUpViewModel.isUserLoggedIn()){
-      Get.offAllNamed('/home');
+      Get.offAllNamed('/posts');
     }
 
   }
@@ -113,7 +110,7 @@ class _SignupPageState extends State<SignupPage> {
 
             const SizedBox(height: 30),
 
-            // Login Button
+
             Obx(() {
               return signUpViewModel.isLoading.value
                   ? const CircularProgressIndicator()
@@ -136,7 +133,7 @@ class _SignupPageState extends State<SignupPage> {
 
             TextButton(
                 onPressed: () {
-                  Get.offAllNamed('login');
+                  Get.offAllNamed('/login');
                 },
                 child: Text(
                   "Already have account; Login",

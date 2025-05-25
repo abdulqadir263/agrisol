@@ -1,5 +1,4 @@
 import 'package:agrisol/data/AuthRepository.dart';
-import 'package:agrisol/ui/home/home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
@@ -23,7 +22,7 @@ class LoginViewModel extends GetxController{
     isLoading.value = true;
     try{
       await authRepository.login(email, password);
-      Get.offAllNamed('/home');
+      Get.offAllNamed('/posts');
       //Success
     }on FirebaseAuthException catch(e){
       Get.snackbar("Error", e.message ?? "Login Failed");
