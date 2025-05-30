@@ -64,10 +64,13 @@ class _PostsPageState extends State<PostsPage> with SingleTickerProviderStateMix
           ));
         }
       },
+
+      leading: post.image == null? Icon(Icons.image, size: 60): Image.network(post.image!, height: 60, width: 60,) ,
+
       title: Text(post.title),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: [ 
           Text(post.description),
           const SizedBox(height: 4),
           Text(

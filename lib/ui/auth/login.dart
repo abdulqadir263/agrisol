@@ -24,7 +24,9 @@ class _LoginPageState extends State<LoginPage> {
     loginViewModel = Get.find();
 
     if(loginViewModel.isUserLoggedIn()){
-      Get.offAllNamed('/posts');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Get.offAllNamed('/your-route');
+      });
     }
 
   }
