@@ -3,11 +3,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AuthRepository{
 
   Future<UserCredential> login(String email, String password){
-    return FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+    return FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password
+    );
   }
 
   Future<UserCredential> signup(String email, String password){
-    return FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+    return FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password
+    );
   }
 
   String? getCurrentUserName() {
@@ -19,7 +25,9 @@ class AuthRepository{
   }
 
   Future<void> resetPassword(String email){
-    return FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    return FirebaseAuth.instance.sendPasswordResetEmail(
+        email: email
+    );
   }
 
   bool isEmailVerified(){
