@@ -1,28 +1,49 @@
+import 'comment.dart';
 
-class Post{
+class Post {
   String id;
   String uId;
   String title;
   String description;
   String? image;
+  String? category;
+  List<Comment>? comments;
 
-  Post(this.id, this.uId, this.title, this.description);
+  Post(
+      this.id,
+      this.uId,
+      this.title,
+      this.description, {
+        this.image,
+        this.category,
+        this.comments,
+      });
 
-
-  static Post fromMap(Map<String, dynamic> map){
-    Post p = Post(map['id'], map['uId'], map['title'], map['description']);
-    p.image = map['image'];
-    return p;
+  factory Post.fromMap(Map<String, dynamic> map) {
+    return Post(
+      map['id'] ?? '',
+      map['uId'] ?? '',
+      map['title'] ?? '',
+      map['description'] ?? '',
+      image: map['image'],
+      category: map['category'],
+      comments: map['comments'] != null
+          ? List<Comment>.from(
+          (map['comments'] as List)
+              .map((c) => Comment.fromMap(Map<String, dynamic>.from(c))))
+          : [],
+    );
   }
 
-  Map<String,dynamic> toMap(){
-    return{
-      'id' : id,
-      'uId' : uId,
-      'title' : title,
-      'description' : description,
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'uId': uId,
+      'title': title,
+      'description': description,
       'image': image,
+      'category': category,
+      'comments': comments?.map((c) => c.toMap()).toList() ?? [],
     };
   }
-
 }

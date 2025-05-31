@@ -1,12 +1,11 @@
-
-import 'package:agrisol/data/AuthRepository.dart';
-import 'package:agrisol/data/PostRepository.dart';
-import 'package:agrisol/data/media_repo.dart';
-import 'package:agrisol/model/post.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../data/AuthRepository.dart';
+import '../../../data/PostRepository.dart';
+import '../../../data/media_repo.dart';
+import '../../../model/post.dart';
 
-class AddPostViewModel extends GetxController{
+class AddPostViewModel extends GetxController {
   AuthRepository authRepository = Get.find();
   PostsRepository postsRepository = Get.find();
   MediaRepository mediaRepository = Get.find();
@@ -14,42 +13,40 @@ class AddPostViewModel extends GetxController{
 
   Rxn<XFile> image = Rxn<XFile>();
 
-  Future<void> addPost(String title, String description, Post? post) async {
-
-    if(title.isEmpty){
+  Future<void> addPost(String title, String description, Post? post, {String? category}) async {
+    if (title.isEmpty) {
       Get.snackbar("Error", "Enter valid Title");
       return;
     }
 
-    if(description.isEmpty){
+    if (description.isEmpty) {
       Get.snackbar("Error", "Enter Description");
       return;
     }
 
     isSaving.value = true;
 
-    if(post == null) {
-      Post post = Post(
-          '',
-          authRepository
-              .getLoggedInUser()
-              ?.uid ?? '',
-          title,
-          description
+    if (post == null) {
+      Post newPost = Post(
+        '',
+        authRepository.getLoggedInUser()?.uid ?? '',
+        title,
+        description,
+        category: category,
       );
 
-      await uploadImage(post);
-      
+      await uploadImage(newPost);
+
       try {
-        await postsRepository.addPost(post);
+        await postsRepository.addPost(newPost);
         Get.back(result: true);
       } catch (e) {
         Get.snackbar("Error", "An unexpected error occurred ${e.toString()}");
       }
-    }else
-    {
+    } else {
       post.title = title;
       post.description = description;
+      post.category = category;
 
       try {
         await uploadImage(post);
@@ -61,27 +58,22 @@ class AddPostViewModel extends GetxController{
     }
 
     isSaving.value = false;
-    }
+  }
 
-    Future<void> uploadImage(Post post) async {
-      if(image.value!=null) {
-        var imageResult = await mediaRepository.uploadImg(image.value!.path);
-        if(imageResult.isSuccessful){
-          post.image = imageResult.url;
-        }else
-        {
-          Get.snackbar('Error Uploading Image',
-              imageResult.error??"Couldn't upload image due to some error"
-          );
-          return;
-        }
+  Future<void> uploadImage(Post post) async {
+    if (image.value != null) {
+      var imageResult = await mediaRepository.uploadImg(image.value!.path);
+      if (imageResult.isSuccessful) {
+        post.image = imageResult.url;
+      } else {
+        Get.snackbar('Error Uploading Image', imageResult.error ?? "Couldn't upload image due to some error");
+        return;
       }
     }
+  }
 
-
-    Future<void> pickImage() async {
-      final ImagePicker picker = ImagePicker();
-      image.value = await picker.pickImage(source: ImageSource.gallery);
-    }
-
+  Future<void> pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    image.value = await picker.pickImage(source: ImageSource.gallery);
+  }
 }

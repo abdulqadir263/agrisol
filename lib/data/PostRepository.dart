@@ -1,42 +1,45 @@
-
 import 'package:agrisol/model/post.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../model/comment.dart';
 
-class PostsRepository{
-
+class PostsRepository {
   late CollectionReference postsCollection;
 
-  PostsRepository(){
+  PostsRepository() {
     postsCollection = FirebaseFirestore.instance.collection('posts');
   }
 
-  Future<void> addPost(Post post){
+  Future<void> addPost(Post post) {
     var doc = postsCollection.doc();
     post.id = doc.id;
     return doc.set(post.toMap());
   }
 
-  Future<void> updatePost(Post post){
+  Future<void> updatePost(Post post) {
     return postsCollection.doc(post.id).set(post.toMap());
   }
 
-  Future<void> deletePost(Post post){
+  Future<void> deletePost(Post post) {
     return postsCollection.doc(post.id).delete();
   }
 
-  Stream<List<Post>> loadAllPosts(){
-     return postsCollection.snapshots().map((snapshot) {
-       return convertToPosts(snapshot);
-    },
-    );
+  Stream<List<Post>> loadAllPosts() {
+    return postsCollection.snapshots().map((snapshot) {
+      return convertToPosts(snapshot);
+    });
   }
 
+  Future<void> addCommentToPost(Post post, Comment comment) async {
+    post.comments ??= [];
+    post.comments!.add(comment);
+    await updatePost(post);
+  }
 
-  Stream<List<Post>> loadPostsOfUser(String uId){
+  Stream<List<Post>> loadPostsOfUser(String uId) {
     return postsCollection.where('uId', isEqualTo: uId).snapshots().map(
           (snapshot) {
-            return convertToPosts(snapshot);
-    },
+        return convertToPosts(snapshot);
+      },
     );
   }
 
@@ -45,9 +48,9 @@ class PostsRepository{
     return convertToPosts(snapshot);
   }
 
-  List<Post> convertToPosts(QuerySnapshot snapshot){
+  List<Post> convertToPosts(QuerySnapshot snapshot) {
     List<Post> posts = [];
-    for(var snap in snapshot.docs){
+    for (var snap in snapshot.docs) {
       posts.add(Post.fromMap(snap.data() as Map<String, dynamic>));
     }
     return posts;

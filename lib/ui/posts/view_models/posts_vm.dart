@@ -1,12 +1,11 @@
-
 import 'package:get/get.dart';
-
 import '../../../data/AuthRepository.dart';
 import '../../../data/PostRepository.dart';
 import '../../../model/post.dart';
+import '../../../model/comment.dart';
+import '../../../constants.dart';
 
-class PostsViewModel extends GetxController{
-
+class PostsViewModel extends GetxController {
   AuthRepository authRepository = Get.find();
   PostsRepository postsRepository = Get.find();
   var isLoading = false.obs;
@@ -18,15 +17,13 @@ class PostsViewModel extends GetxController{
     loadAllPosts();
   }
 
-  void loadAllPosts(){
-    postsRepository.loadAllPosts().listen(
-          (data) {
+  void loadAllPosts() {
+    postsRepository.loadAllPosts().listen((data) {
       posts.value = data;
-    },
-    );
+    });
   }
 
-  void deletePost(Post post){
+  void deletePost(Post post) {
     final currentUser = authRepository.getLoggedInUser();
     if (currentUser != null && post.uId == currentUser.uid) {
       postsRepository.deletePost(post);
@@ -35,6 +32,21 @@ class PostsViewModel extends GetxController{
     }
   }
 
-
-
+  void addComment(Post post, String content) {
+    final currentUser = authRepository.getLoggedInUser();
+    if (currentUser == null || currentUser.email != adminEmail) {
+      Get.snackbar("Error", "Only admin can add comments");
+      return;
+    }
+    if (content.trim().isEmpty) {
+      Get.snackbar("Error", "Comment cannot be empty");
+      return;
+    }
+    final comment = Comment(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      authorEmail: currentUser.email ?? "",
+      content: content,
+    );
+    postsRepository.addCommentToPost(post, comment);
+  }
 }

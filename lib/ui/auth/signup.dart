@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import '../../constants.dart';
 import '../../data/AuthRepository.dart';
+import '../../data/user_role_service.dart';
 import 'view_models/signup_vm.dart';
 
 class SignupPage extends StatefulWidget {
@@ -16,6 +17,7 @@ class _SignupPageState extends State<SignupPage> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
+  bool signupAsAdmin = false;
   late SignUpViewModel signUpViewModel;
 
   @override
@@ -23,10 +25,9 @@ class _SignupPageState extends State<SignupPage> {
     super.initState();
     signUpViewModel = Get.find();
 
-    if(signUpViewModel.isUserLoggedIn()){
+    if (signUpViewModel.isUserLoggedIn()) {
       Get.offAllNamed('/posts');
     }
-
   }
 
   @override
@@ -37,7 +38,6 @@ class _SignupPageState extends State<SignupPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Email Field
             TextField(
               controller: emailController,
               decoration: InputDecoration(
@@ -47,14 +47,10 @@ class _SignupPageState extends State<SignupPage> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                contentPadding:
-                const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
               ),
             ),
-
             const SizedBox(height: 20),
-
-
             TextField(
               obscureText: _obscurePassword,
               controller: passwordController,
@@ -75,14 +71,10 @@ class _SignupPageState extends State<SignupPage> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                contentPadding:
-                const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
               ),
             ),
-
             const SizedBox(height: 20),
-
-            // Password Field
             TextField(
               obscureText: _obscurePassword,
               controller: confirmPasswordController,
@@ -103,19 +95,34 @@ class _SignupPageState extends State<SignupPage> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                contentPadding:
-                const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
               ),
             ),
-
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Checkbox(
+                  value: signupAsAdmin,
+                  onChanged: (v) {
+                    setState(() {
+                      signupAsAdmin = v!;
+                    });
+                  },
+                ),
+                const Text("Signup as Admin"),
+              ],
+            ),
             const SizedBox(height: 30),
-
-
             Obx(() {
               return signUpViewModel.isLoading.value
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
                 onPressed: () {
+                  if (signupAsAdmin && emailController.text != adminEmail) {
+                    Get.snackbar("Error", "Only $adminEmail can signup as Admin");
+                    return;
+                  }
+                  Get.find<UserRoleService>().setRole(emailController.text);
                   signUpViewModel.signup(
                     emailController.text,
                     passwordController.text,
@@ -128,19 +135,16 @@ class _SignupPageState extends State<SignupPage> {
                 ),
               );
             }),
-
             const SizedBox(height: 15),
-
             TextButton(
-                onPressed: () {
-                  Get.offAllNamed('/login');
-                },
-                child: Text(
-                  "Already have account; Login",
-                  style: TextStyle(fontSize: 16),
-                )
+              onPressed: () {
+                Get.offAllNamed('/login');
+              },
+              child: const Text(
+                "Already have account; Login",
+                style: TextStyle(fontSize: 16),
+              ),
             )
-
           ],
         ),
       ),
@@ -148,11 +152,11 @@ class _SignupPageState extends State<SignupPage> {
   }
 }
 
-
-class SignUpBinding extends Bindings{
+class SignUpBinding extends Bindings {
   @override
   void dependencies() {
     Get.put(AuthRepository());
     Get.put(SignUpViewModel());
+    Get.put(UserRoleService());
   }
 }

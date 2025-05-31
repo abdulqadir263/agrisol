@@ -27,7 +27,7 @@ class LoginViewModel extends GetxController{
     }on FirebaseAuthException catch(e){
       Get.snackbar("Error", e.message ?? "Login Failed");
     }
-      isLoading.value = false;
+    isLoading.value = false;
   }
 
   bool isUserLoggedIn(){

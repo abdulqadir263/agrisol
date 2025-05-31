@@ -1,5 +1,5 @@
 import 'package:agrisol/ui/auth/forget_password.dart';
-import 'package:agrisol/ui/home/home.dart';
+import 'package:agrisol/ui/home/admin_home.dart';
 import 'package:agrisol/ui/auth/login.dart';
 import 'package:agrisol/ui/posts/add_post.dart';
 import 'package:agrisol/ui/posts/posts.dart';
