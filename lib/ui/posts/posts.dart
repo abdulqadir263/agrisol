@@ -15,12 +15,12 @@ class PostsPage extends StatefulWidget {
   State<PostsPage> createState() => _PostsPageState();
 }
 
-class _PostsPageState extends State<PostsPage> with SingleTickerProviderStateMixin {
+class _PostsPageState extends State<PostsPage> {
   late PostsViewModel postsViewModel;
   late AuthRepository authRepository;
-  late TabController _tabController;
   late UserRoleService userRoleService;
   final TextEditingController commentController = TextEditingController();
+  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -28,19 +28,12 @@ class _PostsPageState extends State<PostsPage> with SingleTickerProviderStateMix
     postsViewModel = Get.find();
     authRepository = Get.find();
     userRoleService = Get.find();
-    _tabController = TabController(length: 2, vsync: this);
 
-    // Set admin role on login
     final email = authRepository.getLoggedInUser()?.email;
     if (email != null) {
       userRoleService.setRole(email);
     }
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+    postsViewModel.loadSavedPosts();
   }
 
   Future<void> _logout() async {
@@ -55,21 +48,22 @@ class _PostsPageState extends State<PostsPage> with SingleTickerProviderStateMix
       children: [
         ...comments.map((c) => ListTile(
           title: Text(c.content),
-          subtitle: Text("By: ${c.authorEmail}"),
+          subtitle: Text("By Admin"),
         )),
-        Obx(() => userRoleService.isAdmin.value
+        Obx(() =>
+        userRoleService.isAdmin.value
             ? Row(
           children: [
             Expanded(
               child: TextField(
                 controller: commentController,
                 decoration: const InputDecoration(
-                  hintText: "Add comment (admin only)",
+                  hintText: "Add comment (only admin can add comments)",
                 ),
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.send),
+              icon: const Icon(Icons.add),
               onPressed: () {
                 if (commentController.text.trim().isNotEmpty) {
                   postsViewModel.addComment(post, commentController.text.trim());
@@ -85,36 +79,12 @@ class _PostsPageState extends State<PostsPage> with SingleTickerProviderStateMix
   }
 
   Widget _buildPostItem(Post post) {
+    final isMyPost = post.uId == authRepository.getLoggedInUser()?.uid;
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         children: [
           ListTile(
-            onTap: () {
-              if (post.uId == authRepository.getLoggedInUser()?.uid) {
-                Get.dialog(AlertDialog(
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextButton(
-                        child: const Text('Edit'),
-                        onPressed: () {
-                          Get.back();
-                          Get.toNamed('/addPost', arguments: post);
-                        },
-                      ),
-                      TextButton(
-                        child: const Text('Delete'),
-                        onPressed: () {
-                          postsViewModel.deletePost(post);
-                          Get.back();
-                        },
-                      ),
-                    ],
-                  ),
-                ));
-              }
-            },
             leading: post.image == null
                 ? const Icon(Icons.image, size: 60)
                 : Image.network(post.image!, height: 60, width: 60),
@@ -125,7 +95,7 @@ class _PostsPageState extends State<PostsPage> with SingleTickerProviderStateMix
                 Text(post.description),
                 const SizedBox(height: 4),
                 Text(
-                  post.uId == authRepository.getLoggedInUser()?.uid
+                  isMyPost
                       ? 'Posted by you'
                       : 'Posted by others',
                   style: TextStyle(
@@ -148,13 +118,51 @@ class _PostsPageState extends State<PostsPage> with SingleTickerProviderStateMix
                   ),
               ],
             ),
-            tileColor: post.uId == authRepository.getLoggedInUser()?.uid
-                ? Colors.grey[100]
-                : null,
+            tileColor: isMyPost ? Colors.grey[100] : null,
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: _buildCommentsSection(post),
+          ),
+          OverflowBar(
+            alignment: MainAxisAlignment.end,
+            children: [
+              if (isMyPost)
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.orange),
+                  onPressed: () {
+                    Get.toNamed('/addPost', arguments: post);
+                  },
+                ),
+              if (isMyPost)
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () {
+                    postsViewModel.deletePost(post);
+                  },
+                ),
+              Obx(() => IconButton(
+                icon: Icon(
+                  postsViewModel.isPostSaved(post)
+                      ? Icons.bookmark
+                      : Icons.bookmark_border,
+                  color: postsViewModel.isPostSaved(post)
+                      ? Colors.blue
+                      : Colors.grey,
+                ),
+                onPressed: () async {
+                  await postsViewModel.toggleSave(post);
+                  Get.snackbar(
+                    postsViewModel.isPostSaved(post)
+                        ? "Saved"
+                        : "Unsaved",
+                    postsViewModel.isPostSaved(post)
+                        ? "Post saved"
+                        : "Post removed",
+                  );
+                },
+              )),
+            ],
           ),
           const SizedBox(height: 10),
         ],
@@ -162,19 +170,33 @@ class _PostsPageState extends State<PostsPage> with SingleTickerProviderStateMix
     );
   }
 
+  Widget _buildPostsList(List<Post> postsList) {
+    if (postsList.isEmpty) {
+      return const Center(child: Text("No posts available."));
+    }
+    return ListView.builder(
+      itemCount: postsList.length,
+      itemBuilder: (context, index) {
+        return _buildPostItem(postsList[index]);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final allPostsTab = Obx(() => _buildPostsList(postsViewModel.posts));
+    final myPostsTab = Obx(() {
+      final myPosts = postsViewModel.posts
+          .where((post) => post.uId == authRepository.getLoggedInUser()?.uid)
+          .toList();
+      return _buildPostsList(myPosts);
+    });
+    final savedPostsTab = Obx(() => _buildPostsList(postsViewModel.savedPosts));
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Welcome to Agri-Sol!"),
         centerTitle: true,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'All Posts'),
-            Tab(text: 'My Posts'),
-          ],
-        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -192,31 +214,39 @@ class _PostsPageState extends State<PostsPage> with SingleTickerProviderStateMix
         },
         child: const Icon(Icons.add),
       ),
-      body: Obx(() {
-        final myPosts = postsViewModel.posts
-            .where((post) => post.uId == authRepository.getLoggedInUser()?.uid)
-            .toList();
-
-        return TabBarView(
-          controller: _tabController,
-          children: [
-            // All Posts Tab
-            ListView.builder(
-              itemCount: postsViewModel.posts.length,
-              itemBuilder: (context, index) {
-                return _buildPostItem(postsViewModel.posts[index]);
-              },
-            ),
-            // My Posts Tab
-            ListView.builder(
-              itemCount: myPosts.length,
-              itemBuilder: (context, index) {
-                return _buildPostItem(myPosts[index]);
-              },
-            ),
-          ],
-        );
-      }),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: [
+          allPostsTab,
+          myPostsTab,
+          savedPostsTab,
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (i) async {
+          setState(() {
+            _selectedIndex = i;
+          });
+          if (i == 2) {
+            await postsViewModel.loadSavedPosts();
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'My Posts',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark),
+            label: 'Saved Posts',
+          ),
+        ],
+      ),
     );
   }
 }
