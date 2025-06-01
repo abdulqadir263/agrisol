@@ -47,7 +47,10 @@ class _SignupPageState extends State<SignupPage> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 12
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -60,7 +63,9 @@ class _SignupPageState extends State<SignupPage> {
                 prefixIcon: const Icon(Icons.lock),
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                    _obscurePassword ?
+                    Icons.visibility :
+                    Icons.visibility_off,
                   ),
                   onPressed: () {
                     setState(() {
@@ -71,7 +76,10 @@ class _SignupPageState extends State<SignupPage> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 12
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -84,7 +92,9 @@ class _SignupPageState extends State<SignupPage> {
                 prefixIcon: const Icon(Icons.lock),
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                    _obscurePassword ?
+                    Icons.visibility :
+                    Icons.visibility_off,
                   ),
                   onPressed: () {
                     setState(() {
@@ -95,7 +105,10 @@ class _SignupPageState extends State<SignupPage> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 12
+                ),
               ),
             ),
             const SizedBox(height: 10),

@@ -1,9 +1,9 @@
 import 'package:agrisol/ui/auth/forget_password.dart';
-import 'package:agrisol/ui/home/admin_home.dart';
 import 'package:agrisol/ui/auth/login.dart';
 import 'package:agrisol/ui/posts/add_post.dart';
 import 'package:agrisol/ui/posts/posts.dart';
 import 'package:agrisol/ui/auth/signup.dart';
+import 'package:agrisol/ui/saved_posts/saved_posts.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
@@ -33,9 +33,9 @@ class MyApp extends StatelessWidget{
         GetPage(name: "/login", page: () =>  LoginPage(), binding: LoginBinding()),
         GetPage(name: "/signup", page: () =>  SignupPage(), binding: SignUpBinding()),
         GetPage(name: "/forget_password", page: () =>  ResetPasswordPage(), binding: ResetPasswordBinding()),
-        GetPage(name: "/home", page: () =>  HomePage()),
         GetPage(name: "/posts", page: () =>  PostsPage(), binding: PostsBinding()),
         GetPage(name: "/addPost", page: () =>  AddPostPage(), binding: AddPostBinding()),
+        GetPage(name: "/savedPosts", page: () => SavedPostsScreen()), // Added route for saved posts
       ],
 
       initialRoute: '/login',

@@ -1,12 +1,11 @@
 import 'package:agrisol/ui/posts/view_models/posts_vm.dart';
+import 'package:agrisol/ui/saved_posts/view_models/saved_posts_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../constants.dart';
 import '../../data/AuthRepository.dart';
 import '../../data/PostRepository.dart';
 import '../../data/user_role_service.dart';
 import '../../model/post.dart';
-import '../../model/comment.dart';
 
 class PostsPage extends StatefulWidget {
   const PostsPage({super.key});
@@ -19,6 +18,7 @@ class _PostsPageState extends State<PostsPage> {
   late PostsViewModel postsViewModel;
   late AuthRepository authRepository;
   late UserRoleService userRoleService;
+  late SavedPostsViewModel savedPostsViewModel;
   final TextEditingController commentController = TextEditingController();
   int _selectedIndex = 0;
 
@@ -28,12 +28,14 @@ class _PostsPageState extends State<PostsPage> {
     postsViewModel = Get.find();
     authRepository = Get.find();
     userRoleService = Get.find();
+    savedPostsViewModel = Get.find();
 
     final email = authRepository.getLoggedInUser()?.email;
     if (email != null) {
       userRoleService.setRole(email);
     }
-    postsViewModel.loadSavedPosts();
+    // For save/unsave icon button to reflect state immediately
+    postsViewModel.loadAllPosts();
   }
 
   Future<void> _logout() async {
@@ -50,8 +52,7 @@ class _PostsPageState extends State<PostsPage> {
           title: Text(c.content),
           subtitle: Text("By Admin"),
         )),
-        Obx(() =>
-        userRoleService.isAdmin.value
+        Obx(() => userRoleService.isAdmin.value
             ? Row(
           children: [
             Expanded(
@@ -66,7 +67,8 @@ class _PostsPageState extends State<PostsPage> {
               icon: const Icon(Icons.add),
               onPressed: () {
                 if (commentController.text.trim().isNotEmpty) {
-                  postsViewModel.addComment(post, commentController.text.trim());
+                  postsViewModel.addComment(
+                      post, commentController.text.trim());
                   commentController.clear();
                 }
               },
@@ -95,9 +97,7 @@ class _PostsPageState extends State<PostsPage> {
                 Text(post.description),
                 const SizedBox(height: 4),
                 Text(
-                  isMyPost
-                      ? 'Posted by you'
-                      : 'Posted by others',
+                  isMyPost ? 'Posted by you' : 'Posted by others',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.greenAccent[600],
@@ -141,26 +141,30 @@ class _PostsPageState extends State<PostsPage> {
                     postsViewModel.deletePost(post);
                   },
                 ),
+              // SAVE/UNSAVE ICON BUTTON (Obx for reactive state)
               Obx(() => IconButton(
                 icon: Icon(
-                  postsViewModel.isPostSaved(post)
+                  savedPostsViewModel.isPostSaved(post)
                       ? Icons.bookmark
                       : Icons.bookmark_border,
-                  color: postsViewModel.isPostSaved(post)
+                  color: savedPostsViewModel.isPostSaved(post)
                       ? Colors.blue
                       : Colors.grey,
                 ),
                 onPressed: () async {
-                  await postsViewModel.toggleSave(post);
+                  await savedPostsViewModel.toggleSave(post);
                   Get.snackbar(
-                    postsViewModel.isPostSaved(post)
+                    savedPostsViewModel.isPostSaved(post)
                         ? "Saved"
                         : "Unsaved",
-                    postsViewModel.isPostSaved(post)
+                    savedPostsViewModel.isPostSaved(post)
                         ? "Post saved"
                         : "Post removed",
                   );
                 },
+                tooltip: savedPostsViewModel.isPostSaved(post)
+                    ? "Unsave Post"
+                    : "Save Post",
               )),
             ],
           ),
@@ -191,7 +195,6 @@ class _PostsPageState extends State<PostsPage> {
           .toList();
       return _buildPostsList(myPosts);
     });
-    final savedPostsTab = Obx(() => _buildPostsList(postsViewModel.savedPosts));
 
     return Scaffold(
       appBar: AppBar(
@@ -219,18 +222,25 @@ class _PostsPageState extends State<PostsPage> {
         children: [
           allPostsTab,
           myPostsTab,
-          savedPostsTab,
+          // Placeholder for SavedPosts tab
+          Container(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (i) async {
+          if (i == 2) {
+            // Go to SavedPostsScreen on Saved Posts tab tap
+            await Get.toNamed('/savedPosts');
+            // Optionally reset tab to previous after returning
+            setState(() {
+              _selectedIndex = 0;
+            });
+            return;
+          }
           setState(() {
             _selectedIndex = i;
           });
-          if (i == 2) {
-            await postsViewModel.loadSavedPosts();
-          }
         },
         items: const [
           BottomNavigationBarItem(
@@ -258,5 +268,6 @@ class PostsBinding extends Bindings {
     Get.put(PostsRepository());
     Get.put(PostsViewModel());
     Get.put(UserRoleService());
+    Get.put(SavedPostsViewModel());
   }
 }

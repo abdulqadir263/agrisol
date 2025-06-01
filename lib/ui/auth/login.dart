@@ -1,7 +1,6 @@
 import 'package:agrisol/ui/auth/view_models/login_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:agrisol/ui/posts/posts.dart';
 import '../../constants.dart';
 import '../../data/AuthRepository.dart';
 import '../../data/user_role_service.dart';
@@ -52,7 +51,10 @@ class _LoginPageState extends State<LoginPage> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 12
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -66,7 +68,9 @@ class _LoginPageState extends State<LoginPage> {
                 prefixIcon: const Icon(Icons.lock),
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                    _obscurePassword ?
+                    Icons.visibility :
+                    Icons.visibility_off,
                   ),
                   onPressed: () {
                     setState(() {
@@ -77,7 +81,10 @@ class _LoginPageState extends State<LoginPage> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 12
+                ),
               ),
             ),
             const SizedBox(height: 10),
