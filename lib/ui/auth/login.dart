@@ -1,3 +1,4 @@
+import 'package:agrisol/data/user_repository.dart';
 import 'package:agrisol/ui/auth/view_models/login_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -166,5 +167,6 @@ class LoginBinding extends Bindings {
     Get.put(AuthRepository());
     Get.put(LoginViewModel());
     Get.put(UserRoleService());
+    Get.put(UserRepository());
   }
 }

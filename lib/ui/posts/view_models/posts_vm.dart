@@ -1,13 +1,14 @@
 import 'package:get/get.dart';
 import '../../../data/AuthRepository.dart';
 import '../../../data/PostRepository.dart';
+import '../../../data/user_repository.dart';
 import '../../../model/post.dart';
 import '../../../model/comment.dart';
-import '../../../constants.dart';
 
 class PostsViewModel extends GetxController {
   AuthRepository authRepository = Get.find();
   PostsRepository postsRepository = Get.find();
+  UserRepository userRepository = Get.find();
   var isLoading = false.obs;
   var posts = <Post>[].obs;
 
@@ -32,21 +33,55 @@ class PostsViewModel extends GetxController {
     }
   }
 
-  void addComment(Post post, String content) {
+  Future<void> addComment(
+      Post post,
+      String content, {
+        String? authorUid,
+        String? authorUsername,
+      }) async {
     final currentUser = authRepository.getLoggedInUser();
-    if (currentUser == null || currentUser.email != adminEmail) {
-      Get.snackbar("Error", "Only admin can add comments");
+    final uid = authorUid ?? currentUser?.uid;
+    if (uid == null) {
+      Get.snackbar("Error", "You must be logged in to comment");
       return;
     }
     if (content.trim().isEmpty) {
       Get.snackbar("Error", "Comment cannot be empty");
       return;
     }
+
+    String? username = authorUsername;
+    if (username == null) {
+      final appUser = await userRepository.getUserByUid(uid);
+      username = appUser?.username ?? 'user';
+    }
+
     final comment = Comment(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      authorEmail: currentUser.email ?? "",
+      authorUid: uid,
+      authorUsername: username,
       content: content,
+      timestamp: DateTime.now(),
+      likedBy: [],
     );
-    postsRepository.addCommentToPost(post, comment);
+    await postsRepository.addCommentToPost(post, comment);
+  }
+
+  void likeComment(Post post, Comment comment) {
+    final userUid = authRepository.getLoggedInUser()?.uid ?? "";
+    if (comment.likedBy.contains(userUid)) return;
+    for (var c in post.comments ?? []) {
+      c.likedBy.remove(userUid);
+    }
+    comment.likedBy.add(userUid);
+    postsRepository.updateCommentLikeStatus(post, comment);
+    update();
+  }
+
+  void unlikeComment(Post post, Comment comment) {
+    final userUid = authRepository.getLoggedInUser()?.uid ?? "";
+    comment.likedBy.remove(userUid);
+    postsRepository.updateCommentLikeStatus(post, comment);
+    update();
   }
 }

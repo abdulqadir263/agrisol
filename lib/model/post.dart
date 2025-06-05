@@ -3,6 +3,7 @@ import 'comment.dart';
 class Post {
   String id;
   String uId;
+  String authorUsername;
   String title;
   String description;
   String? image;
@@ -12,6 +13,7 @@ class Post {
   Post(
       this.id,
       this.uId,
+      this.authorUsername,
       this.title,
       this.description, {
         this.image,
@@ -23,6 +25,7 @@ class Post {
     return Post(
       map['id'] ?? '',
       map['uId'] ?? '',
+      map['authorUsername'] ?? '',
       map['title'] ?? '',
       map['description'] ?? '',
       image: map['image'],
@@ -39,6 +42,7 @@ class Post {
     return {
       'id': id,
       'uId': uId,
+      'authorUsername': authorUsername,
       'title': title,
       'description': description,
       'image': image,

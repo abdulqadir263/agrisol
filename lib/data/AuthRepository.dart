@@ -1,31 +1,23 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../data/user_repository.dart';
+import '../model/user.dart';
 
 class AuthRepository {
-  final _usersCollection = FirebaseFirestore.instance.collection('users');
+  final _userRepo = UserRepository();
 
-  Future<UserCredential> login(String email, String password) async {
-    final cred = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email, password: password);
-    final doc = await _usersCollection.doc(cred.user!.uid).get();
-    if (!doc.exists) {
-      await _usersCollection.doc(cred.user!.uid).set({
-        'uid': cred.user!.uid,
-        'email': cred.user!.email,
-        'savedPosts': [],
-      });
-    }
-    return cred;
+  Future<UserCredential> login(String email, String password){
+    return FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
   }
 
-  Future<UserCredential> signup(String email, String password) async {
-    final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email, password: password);
-    await _usersCollection.doc(cred.user!.uid).set({
-      'uid': cred.user!.uid,
-      'email': cred.user!.email,
-      'savedPosts': [],
-    });
+  Future<UserCredential> signup(String email, String password, String username, {String? contact, String? location}) async {
+    final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+    await _userRepo.createUserDocument(
+      user: cred.user!,
+      username: username,
+      contact: contact,
+      location: location,
+    );
     return cred;
   }
 
@@ -35,6 +27,12 @@ class AuthRepository {
 
   User? getLoggedInUser() {
     return FirebaseAuth.instance.currentUser;
+  }
+
+  Future<AppUser?> getCurrentAppUser() async {
+    final user = getLoggedInUser();
+    if (user == null) return null;
+    return await _userRepo.getUserByUid(user.uid);
   }
 
   Future<void> resetPassword(String email) {

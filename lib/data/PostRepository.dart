@@ -35,6 +35,11 @@ class PostsRepository {
     await updatePost(post);
   }
 
+  Future<void> updateCommentLikeStatus(Post post, Comment comment) async {
+    // just update the whole post for simplicity (as comments are embedded)
+    await updatePost(post);
+  }
+
   Stream<List<Post>> loadPostsOfUser(String uId) {
     return postsCollection.where('uId', isEqualTo: uId).snapshots().map(
           (snapshot) {

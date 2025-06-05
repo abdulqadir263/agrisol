@@ -3,12 +3,14 @@ import 'package:image_picker/image_picker.dart';
 import '../../../data/AuthRepository.dart';
 import '../../../data/PostRepository.dart';
 import '../../../data/media_repo.dart';
+import '../../../data/user_repository.dart';
 import '../../../model/post.dart';
 
 class AddPostViewModel extends GetxController {
   AuthRepository authRepository = Get.find();
   PostsRepository postsRepository = Get.find();
   MediaRepository mediaRepository = Get.find();
+  UserRepository userRepository = Get.find();
   var isSaving = false.obs;
 
   Rxn<XFile> image = Rxn<XFile>();
@@ -26,10 +28,16 @@ class AddPostViewModel extends GetxController {
 
     isSaving.value = true;
 
+    final currentUser = authRepository.getLoggedInUser();
+    final uid = currentUser?.uid ?? '';
+    final appUser = await userRepository.getUserByUid(uid);
+    final authorUsername = appUser?.username ?? 'user';
+
     if (post == null) {
       Post newPost = Post(
         '',
-        authRepository.getLoggedInUser()?.uid ?? '',
+        uid,
+        authorUsername,
         title,
         description,
         category: category,
@@ -47,6 +55,7 @@ class AddPostViewModel extends GetxController {
       post.title = title;
       post.description = description;
       post.category = category;
+      post.authorUsername = authorUsername; // update username if changed
 
       try {
         await uploadImage(post);
