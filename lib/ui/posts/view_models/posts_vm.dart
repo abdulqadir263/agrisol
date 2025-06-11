@@ -74,14 +74,20 @@ class PostsViewModel extends GetxController {
       c.likedBy.remove(userUid);
     }
     comment.likedBy.add(userUid);
-    postsRepository.updateCommentLikeStatus(post, comment);
+
+    // If current user is author, persist the author-liked-comment
+    final isAuthor = post.uId == userUid;
+    postsRepository.updateCommentLikeStatus(post, comment, isAuthor: isAuthor);
     update();
   }
 
   void unlikeComment(Post post, Comment comment) {
     final userUid = authRepository.getLoggedInUser()?.uid ?? "";
     comment.likedBy.remove(userUid);
-    postsRepository.updateCommentLikeStatus(post, comment);
+
+    // If current user is author, clear the author-liked-comment if needed
+    final isAuthor = post.uId == userUid;
+    postsRepository.updateCommentLikeStatus(post, comment, isAuthor: isAuthor);
     update();
   }
 }

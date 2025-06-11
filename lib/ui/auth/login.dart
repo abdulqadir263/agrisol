@@ -2,9 +2,7 @@ import 'package:agrisol/data/user_repository.dart';
 import 'package:agrisol/ui/auth/view_models/login_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../constants.dart';
 import '../../data/AuthRepository.dart';
-import '../../data/user_role_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,7 +15,6 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool loginAsAdmin = false;
   late LoginViewModel loginViewModel;
 
   @override
@@ -42,7 +39,6 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             Text("Login to Continue", style: TextStyle(fontSize: 20)),
             const SizedBox(height: 20),
-            // Email Field
             TextField(
               controller: emailController,
               decoration: InputDecoration(
@@ -59,7 +55,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             const SizedBox(height: 20),
-            // Password Field
             TextField(
               obscureText: _obscurePassword,
               controller: passwordController,
@@ -88,31 +83,12 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Checkbox(
-                  value: loginAsAdmin,
-                  onChanged: (v) {
-                    setState(() {
-                      loginAsAdmin = v!;
-                    });
-                  },
-                ),
-                const Text("Login as Admin"),
-              ],
-            ),
             const SizedBox(height: 20),
             Obx(() {
               return loginViewModel.isLoading.value
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
                 onPressed: () {
-                  if (loginAsAdmin && emailController.text != adminEmail) {
-                    Get.snackbar("Error", "Only $adminEmail can login as Admin");
-                    return;
-                  }
-                  Get.find<UserRoleService>().setRole(emailController.text);
                   loginViewModel.login(
                     emailController.text,
                     passwordController.text,
@@ -166,7 +142,6 @@ class LoginBinding extends Bindings {
   void dependencies() {
     Get.put(AuthRepository());
     Get.put(LoginViewModel());
-    Get.put(UserRoleService());
     Get.put(UserRepository());
   }
 }

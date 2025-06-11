@@ -9,6 +9,7 @@ class Post {
   String? image;
   String? category;
   List<Comment>? comments;
+  String? authorLikedCommentId; // <-- NEW FIELD
 
   Post(
       this.id,
@@ -19,6 +20,7 @@ class Post {
         this.image,
         this.category,
         this.comments,
+        this.authorLikedCommentId, // <-- NEW FIELD
       });
 
   factory Post.fromMap(Map<String, dynamic> map) {
@@ -35,6 +37,7 @@ class Post {
           (map['comments'] as List)
               .map((c) => Comment.fromMap(Map<String, dynamic>.from(c))))
           : [],
+      authorLikedCommentId: map['authorLikedCommentId'], // <-- NEW FIELD
     );
   }
 
@@ -48,6 +51,7 @@ class Post {
       'image': image,
       'category': category,
       'comments': comments?.map((c) => c.toMap()).toList() ?? [],
+      'authorLikedCommentId': authorLikedCommentId, // <-- NEW FIELD
     };
   }
 }

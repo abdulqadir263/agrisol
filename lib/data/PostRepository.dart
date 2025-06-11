@@ -35,8 +35,15 @@ class PostsRepository {
     await updatePost(post);
   }
 
-  Future<void> updateCommentLikeStatus(Post post, Comment comment) async {
-    // just update the whole post for simplicity (as comments are embedded)
+  Future<void> updateCommentLikeStatus(Post post, Comment comment, {bool isAuthor = false}) async {
+    // If the post author liked the comment, update authorLikedCommentId
+    if (isAuthor) {
+      post.authorLikedCommentId = comment.id;
+    }
+    // If unliking as author, clear field if needed
+    if (isAuthor && !(comment.likedBy.contains(post.uId))) {
+      post.authorLikedCommentId = null;
+    }
     await updatePost(post);
   }
 

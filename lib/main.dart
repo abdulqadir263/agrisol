@@ -17,7 +17,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Moved Get.put before runApp for proper dependency injection
   Get.put<AuthRepository>(AuthRepository(), permanent: true);
   Get.put<UserRepository>(UserRepository(), permanent: true);
 

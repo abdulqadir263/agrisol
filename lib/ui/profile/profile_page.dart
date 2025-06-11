@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../data/user_repository.dart';
 import '../../ui/profile/profile_vm.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -58,14 +57,11 @@ class _ProfilePageState extends State<ProfilePage> {
       Get.snackbar("Username taken", "Please choose another username");
       return;
     }
-    if (widget.isFirstTime) {
-      Get.offAllNamed('/posts');
-    } else {
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context, true); // return to previous page if available
-      }
-      Get.snackbar("Profile updated", "Your profile has been updated");
-    }
+    Get.offAllNamed('/posts');
+  }
+
+  void _completeLater() {
+    Get.offAllNamed('/posts');
   }
 
   @override
@@ -137,9 +133,15 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: loading ? null : _saveProfile,
-                    child: Text(widget.isFirstTime
-                        ? "Complete Profile"
-                        : "Update Profile"),
+                    child: const Text("Complete Profile"),
+                  ),
+                  const SizedBox(height: 15),
+                  TextButton(
+                    onPressed: loading ? null : _completeLater,
+                    child: const Text(
+                      "Complete Profile Later",
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
                 ],
               ),

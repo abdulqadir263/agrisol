@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../constants.dart';
 import '../../data/AuthRepository.dart';
-import '../../data/user_role_service.dart';
 import 'view_models/signup_vm.dart';
 
 class SignupPage extends StatefulWidget {
@@ -13,18 +11,16 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController confirmPasswordController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
-  bool signupAsAdmin = false;
   late SignUpViewModel signUpViewModel;
 
   @override
   void initState() {
     super.initState();
     signUpViewModel = Get.find();
-
     if (signUpViewModel.isUserLoggedIn()) {
       Get.offAllNamed('/posts');
     }
@@ -47,10 +43,7 @@ class _SignupPageState extends State<SignupPage> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 12
-                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
               ),
             ),
             const SizedBox(height: 20),
@@ -62,24 +55,13 @@ class _SignupPageState extends State<SignupPage> {
                 hintText: "Enter your password",
                 prefixIcon: const Icon(Icons.lock),
                 suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscurePassword ?
-                    Icons.visibility :
-                    Icons.visibility_off,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
+                  icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 12
-                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
               ),
             ),
             const SizedBox(height: 20),
@@ -91,39 +73,14 @@ class _SignupPageState extends State<SignupPage> {
                 hintText: "Confirm your password",
                 prefixIcon: const Icon(Icons.lock),
                 suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscurePassword ?
-                    Icons.visibility :
-                    Icons.visibility_off,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
+                  icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 12
-                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
               ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Checkbox(
-                  value: signupAsAdmin,
-                  onChanged: (v) {
-                    setState(() {
-                      signupAsAdmin = v!;
-                    });
-                  },
-                ),
-                const Text("Signup as Admin"),
-              ],
             ),
             const SizedBox(height: 30),
             Obx(() {
@@ -131,32 +88,19 @@ class _SignupPageState extends State<SignupPage> {
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
                 onPressed: () {
-                  if (signupAsAdmin && emailController.text != adminEmail) {
-                    Get.snackbar("Error", "Only $adminEmail can signup as Admin");
-                    return;
-                  }
-                  Get.find<UserRoleService>().setRole(emailController.text);
                   signUpViewModel.signup(
                     emailController.text,
                     passwordController.text,
                     confirmPasswordController.text,
                   );
                 },
-                child: const Text(
-                  "SIGNUP",
-                  style: TextStyle(fontSize: 16),
-                ),
+                child: const Text("SIGNUP", style: TextStyle(fontSize: 16)),
               );
             }),
             const SizedBox(height: 15),
             TextButton(
-              onPressed: () {
-                Get.offAllNamed('/login');
-              },
-              child: const Text(
-                "Already have account; Login",
-                style: TextStyle(fontSize: 16),
-              ),
+              onPressed: () => Get.offAllNamed('/login'),
+              child: const Text("Already have account; Login", style: TextStyle(fontSize: 16)),
             )
           ],
         ),
@@ -170,6 +114,5 @@ class SignUpBinding extends Bindings {
   void dependencies() {
     Get.put(AuthRepository());
     Get.put(SignUpViewModel());
-    Get.put(UserRoleService());
   }
 }

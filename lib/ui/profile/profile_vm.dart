@@ -5,7 +5,6 @@ import '../../model/user.dart';
 
 class ProfileViewModel extends GetxController {
   final UserRepository repo = Get.find<UserRepository>();
-
   var isLoading = false.obs;
   var appUser = Rxn<AppUser>();
 
@@ -26,7 +25,6 @@ class ProfileViewModel extends GetxController {
       isLoading.value = false;
       return false;
     }
-    // Check uniqueness
     if (await repo.isUsernameTaken(username) &&
         (await repo.getUserByUid(user.uid))?.username != username) {
       isLoading.value = false;

@@ -8,7 +8,6 @@ class SignUpViewModel extends GetxController {
   UserRepository userRepository = Get.find();
   var isLoading = false.obs;
 
-  // For legacy use (without username)
   Future<void> signup(String email, String password, String confirmPassword) async {
     if (!email.contains("@")) {
       Get.snackbar("Error", "Enter valid Email");
@@ -25,10 +24,10 @@ class SignUpViewModel extends GetxController {
 
     isLoading.value = true;
     try {
-      final cred = await authRepository.signup(email, password, ""); // Username required for new flow
+      final cred = await authRepository.signup(email, password, "");
       final user = cred.user;
       if (user != null) {
-        await userRepository.createUserDocument(user: user, username: ""); // Empty for legacy
+        await userRepository.createUserDocument(user: user, username: "");
       }
       Get.offAllNamed("/profile");
     } on FirebaseAuthException catch (e) {
