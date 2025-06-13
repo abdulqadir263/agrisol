@@ -23,8 +23,17 @@ class SavedPostsRepository {
 
   Future<List<Post>> getSavedPosts() async {
     List<String> savedIds = await getSavedPostIds();
-    List<Post> allPosts = await postsRepository.loadAllPostsOnce();
-    return allPosts.where((p) => savedIds.contains(p.id)).toList();
+    if (savedIds.isEmpty) return [];
+    List<Post> savedPosts = [];
+    for (int i = 0; i < savedIds.length; i += 10) {
+      final batch = savedIds.skip(i).take(10).toList();
+      final query = await FirebaseFirestore.instance
+          .collection('posts')
+          .where(FieldPath.documentId, whereIn: batch)
+          .get();
+      savedPosts.addAll(query.docs.map((doc) => Post.fromMap(doc.data())));
+    }
+    return savedPosts;
   }
 
   Future<void> savePost(String postId) async {

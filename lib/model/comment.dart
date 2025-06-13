@@ -3,7 +3,6 @@ class Comment {
   String authorUid;
   String authorUsername;
   String content;
-  DateTime? timestamp;
   List<String> likedBy;
 
   Comment({
@@ -11,7 +10,6 @@ class Comment {
     required this.authorUid,
     required this.authorUsername,
     required this.content,
-    this.timestamp,
     List<String>? likedBy,
   }) : likedBy = likedBy ?? [];
 
@@ -21,9 +19,6 @@ class Comment {
       authorUid: map['authorUid'] ?? '',
       authorUsername: map['authorUsername'] ?? '',
       content: map['content'] ?? '',
-      timestamp: map['timestamp'] != null
-          ? DateTime.tryParse(map['timestamp'].toString())
-          : null,
       likedBy: (map['likedBy'] as List?)?.map((e) => e.toString()).toList() ?? [],
     );
   }
@@ -34,7 +29,6 @@ class Comment {
       'authorUid': authorUid,
       'authorUsername': authorUsername,
       'content': content,
-      'timestamp': timestamp?.toIso8601String(),
       'likedBy': likedBy,
     };
   }

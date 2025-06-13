@@ -52,13 +52,6 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
 
     final comments = post.comments ?? [];
     final authorLikedId = post.authorLikedCommentId;
-    final likedComment = authorLikedId != null
-        ? comments.firstWhereOrNull((c) => c.id == authorLikedId)
-        : null;
-    final restComments = likedComment != null
-        ? comments.where((c) => c.id != likedComment.id).toList()
-        : comments;
-
     final isPostAuthor = post.uId == currentUser?.uid;
 
     return Scaffold(
@@ -82,11 +75,21 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
             const Divider(height: 32),
             Text("Comments", style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 10),
-            if (likedComment != null)
-              _buildCommentTile(context, post, likedComment, isPostAuthor, accepted: true),
-            ...restComments.map(
-                  (c) => _buildCommentTile(context, post, c, isPostAuthor, accepted: false),
-            ),
+            ...comments.map((comment) {
+              final accepted = (authorLikedId != null && authorLikedId == comment.id);
+              // Only show accept button if:
+              // - the user is the post author
+              // - and either no comment is currently accepted, or this is the accepted one
+              final showAccept = isPostAuthor && (authorLikedId == null || accepted);
+              return _buildCommentTile(
+                context,
+                post,
+                comment,
+                isPostAuthor,
+                accepted: accepted,
+                showAccept: showAccept,
+              );
+            }).toList(),
             const SizedBox(height: 20),
             _buildAddCommentBar(context, post),
           ],
@@ -95,7 +98,14 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
     );
   }
 
-  Widget _buildCommentTile(BuildContext context, Post post, Comment comment, bool isPostAuthor, {bool accepted = false}) {
+  Widget _buildCommentTile(
+      BuildContext context,
+      Post post,
+      Comment comment,
+      bool isPostAuthor, {
+        bool accepted = false,
+        bool showAccept = true,
+      }) {
     return Card(
       color: accepted ? Colors.green[50] : null,
       margin: const EdgeInsets.symmetric(vertical: 7),
@@ -110,19 +120,19 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
           ),
         ),
         subtitle: Text("by @${comment.authorUsername}"),
-        trailing: isPostAuthor
+        trailing: isPostAuthor && showAccept
             ? IconButton(
           icon: accepted
               ? const Icon(Icons.check_circle, color: Colors.green)
               : const Icon(Icons.check, color: Colors.grey),
           tooltip: accepted ? "Unaccept" : "Accept this comment",
-          onPressed: () {
+          onPressed: () async {
             if (accepted) {
               postsViewModel.unlikeComment(post, comment);
             } else {
               postsViewModel.likeComment(post, comment);
             }
-            setState(() {}); // Refresh for immediate UI response
+            setState(() {});
           },
         )
             : null,
@@ -168,7 +178,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                 );
                 _controller.clear();
                 FocusScope.of(context).unfocus();
-                setState(() {}); // Refresh to show the new comment
+                setState(() {});
               }
             },
             child: Padding(

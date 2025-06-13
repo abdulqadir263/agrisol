@@ -61,7 +61,6 @@ class PostsViewModel extends GetxController {
       authorUid: uid,
       authorUsername: username,
       content: content,
-      timestamp: DateTime.now(),
       likedBy: [],
     );
     await postsRepository.addCommentToPost(post, comment);

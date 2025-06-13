@@ -6,7 +6,7 @@ class MediaRepository{
   late Cloudinary cloundinary;
 
   MediaRepository(){
-      cloundinary = Cloudinary.full (
+    cloundinary = Cloudinary.full (
       apiKey: '789549317331418',
       apiSecret: 'gc4i7_k7v8eZLBlX3JzS8yeZmRM',
       cloudName: 'dybx88bzo',
